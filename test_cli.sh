@@ -5,14 +5,12 @@ CLI=./target/release/zkwasm-cli
 set -e
 set -x
 
-CUDA="--features perf"
-
 test_continuation_cli() {
-    cargo build --release --features continuation $CUDA
+    cargo build --release --features continuation,perf,profile,cuda
     rm -rf params/*.data params/*.config output
-    $CLI --params ./params mongomerkle setup
+    $CLI --params ./params mongomerkle setup --host standard
     $CLI --params ./params mongomerkle dry-run --wasm crates/zkwasm/wasm/mongomerkle.wasm --output ./output
-    $CLI --params ./params mongomerkle prove --wasm crates/zkwasm/wasm/mongomerkle.wasm --output ./output
+    CUDA_VISIBLE_DEVICES=0 $CLI --params ./params mongomerkle prove --wasm crates/zkwasm/wasm/mongomerkle.wasm --output ./output
     $CLI --params ./params mongomerkle verify --output ./output
 }
 
