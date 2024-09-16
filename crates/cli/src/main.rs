@@ -17,6 +17,7 @@ use delphinus_zkwasm::runtime::host::default_env::ExecutionArg;
 use args::HostMode;
 use config::Config;
 use delphinus_zkwasm::runtime::host::HostEnvBuilder;
+use delphinus_zkwasm::zkwasm_host_circuits::host::db::MongoDB;
 use names::name_of_config;
 use names::name_of_etable_slice;
 use names::name_of_frame_table_slice;
@@ -143,6 +144,11 @@ fn main() -> Result<()> {
                 TraceBackend::Memory
             };
 
+            // generate 32 bytes of 8s
+            let collection_name = [8u8; 32];
+
+            println!("collection_name: {:?}", collection_name);
+
             let env_builder: Box<dyn HostEnvBuilder> = match config.host_mode {
                 HostMode::Default => Box::new(DefaultHostEnvBuilder),
                 HostMode::Standard => Box::<StandardHostEnvBuilder>::default(),
@@ -158,7 +164,7 @@ fn main() -> Result<()> {
                     private_inputs,
                     context_inputs,
                     indexed_witness: Rc::new(RefCell::new(HashMap::default())),
-                    tree_db: None,
+                    tree_db: Some(Rc::new(RefCell::new(MongoDB::new(collection_name, None)))),
                 },
                 arg.running_arg.context_output,
                 arg.mock_test,
