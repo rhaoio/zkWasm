@@ -5,7 +5,7 @@
 1. `mkdir db`
 2. `mongod --dbpath db`
 
-## Run test cli script
+### Run test cli script
 
 ```bash
 bash test_cli.sh
